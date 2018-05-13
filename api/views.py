@@ -170,3 +170,9 @@ class CategoryListResource(Resource):
             db.session.rollback()
             resp = jsonify({'error': str(e)})
             return resp, status.HTTP_400_BAD_REQUEST
+
+
+api.add_resource(CategoryListResource, '/categories/')
+api.add_resource(CategoryResource, '/categories/<int:id>')
+api.add_resource(MessageListResource, '/messages/')
+api.add_resource(MessageResource, '/messages/<int:id>')

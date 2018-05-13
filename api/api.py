@@ -2,7 +2,7 @@ import status
 from flask import Flask
 from flask_restful import abort, Api, fields, marshal_with, reqparse, Resource
 from datetime import datetime
-from models import MessageModel
+from models import Message
 from pytz import utc
 
 
@@ -106,7 +106,7 @@ class MessageList(Resource):
                             required=True, 
                             help='Message category cannot be blank!')
         args = parser.parse_args()
-        message = MessageModel(message=args['message'], 
+        message = Message(message=args['message'], 
                                duration=args['duration'],
                                creation_date=datetime.now(utc),
                                message_category=args['message_category'])
