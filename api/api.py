@@ -92,7 +92,7 @@ class MessageList(Resource):
     @marshal_with(message_fields)
     def get(self):
         """Возвращает список сообщений"""
-        return [v for v in message_manager.values()]
+        return [v for v in message_manager.messages.values()]
     
     @marshal_with(message_fields)
     def post(self):
@@ -112,3 +112,14 @@ class MessageList(Resource):
                                message_category=args['message_category'])
         message_manager.insert_message(message)
         return message, status.HTTP_201_CREATED
+
+
+app = Flask(__name__)
+api = Api(app)
+api.add_resource(MessageList, '/api/messages/')
+api.add_resource(Message, '/api/messages/<int:id>',
+                 endpoint='message_endpoint')
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True)
