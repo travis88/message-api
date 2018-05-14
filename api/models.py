@@ -29,13 +29,14 @@ class AddUpdateDelete():
 class Message(db.Model, AddUpdateDelete): 
     """Сообщение"""
     
+    __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.String(250), unique=True, nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     creation_date = db.Column(db.TIMESTAMP, 
                               server_default=db.func.current_timestamp(),
                               nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id',
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id',
                                                        ondelete='CASCADE'),
                             nullable=False)
     category = db.relationship('Category', 
@@ -54,6 +55,7 @@ class Message(db.Model, AddUpdateDelete):
 class Category(db.Model, AddUpdateDelete):
     """Категория"""
 
+    __tablename__ = 'categories'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), unique=True, nullable=False)
 
