@@ -2,6 +2,8 @@
 from marshmallow import Schema, fields, pre_load, validate
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from passlib.apps import custom_app_context as password_context
+import re
 
 
 db = SQLAlchemy()
@@ -24,6 +26,41 @@ class AddUpdateDelete():
         """Удаление"""
         db.session.delete(resource)
         return db.session.commit()
+
+
+class User(db.Model, AddUpdateDelete):
+    """Пользователь"""
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    hashed_password = db.Column(db.String(120), nullable=False)
+    creation_date = db.Column(db.TIMESTAMP, 
+                              server_default=db.func.current_timestamp(),
+                              nullable=False)
+    
+    def verify_password(self, password):
+        """Подтверждение пароля"""
+        return password_context.verify(password, self.hashed_password)
+
+    def check_password_strength_and_hash_if_ok(self, password):
+        """Проверка сложности пароля"""
+        if len(password) < 8:
+            return 'Password is too short', False
+        if len(password) > 32:
+            return 'Password is too long', False
+        if re.search(r'[A-Z]', password) is None:
+            return 'Password must include at least one uppercase letter', False
+        if re.search(r'[a-z]', password) is None:
+            return 'Password must include at least one lowercase letter', False
+        if re.search(r'\d', password) is None:
+            return 'Password must include at least one number', False
+        if re.search(r"[ !#$%&'()*+,-./[\\\]^_`{|}~"+r'"]', password) is None:
+            return 'Password must include at least one symbol', False
+        self.hashed_password = password_context.encrypt(password)
+        return '', True
+
+    def __init__(self, name):
+        self.name = name
 
 
 class Message(db.Model, AddUpdateDelete): 
