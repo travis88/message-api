@@ -1,6 +1,8 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify, make_response, g
 from flask_restful import Api, Resource
-from models import db, Category, CategorySchema, Message, MessageSchema
+from flask_httpauth import HTTPBasicAuth
+from models import db, Category, CategorySchema, Message, MessageSchema, \
+                    User, UserSchema
 from sqlalchemy.exc import SQLAlchemyError
 from helpers import PaginationHelper
 import status
@@ -10,6 +12,22 @@ api_bp = Blueprint('api', __name__)
 category_schema = CategorySchema()
 message_schema = MessageSchema()
 api = Api(api_bp)
+auth = HTTPBasicAuth()
+
+
+@auth.verify_password
+def verify_user_password(name, password):
+    """Авторизация пользователя"""
+    user = User.query.filter_by(name=name).first()
+    if not user or not user.verify_password(password):
+        return False
+    g.user = user
+    return True
+
+
+class AuthRequiredResource(Resource):
+    """Авторизация"""
+    method_decorators = [auth.login_required]
 
 
 class MessageResource(Resource):

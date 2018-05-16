@@ -63,6 +63,14 @@ class User(db.Model, AddUpdateDelete):
         self.name = name
 
 
+class UserSchema(ma.Schema):
+    """Схема для сериализации пользователя"""
+
+    id = fields.Integer(dump_only=True)
+    name = fields.String(required=True, validate=validate.Length(3))
+    url = ma.URLFor('api.userresource', id='<id>', _external=True)
+
+
 class Message(db.Model, AddUpdateDelete): 
     """Сообщение"""
     
