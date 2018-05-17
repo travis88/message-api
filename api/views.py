@@ -248,7 +248,7 @@ class CategoryListResource(AuthRequiredResource):
         return result
     
     def post(self):
-        """Добавляте категорию"""
+        """Добавляет категорию"""
         request_dict = request.get_json()
         if not request_dict:
             resp = {'message': 'No input data provided'}
